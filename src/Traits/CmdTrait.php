@@ -47,7 +47,7 @@ trait CmdTrait
      */
     protected function writeLink(OutputInterface $output, string $label, string $url): void
     {
-        $output->writeln("<comment>${$label} 👉</comment> ${$url}");
+        $output->writeln("<comment>" . $label . " 👉</comment> " . $url);
     }
 
     /**
@@ -56,7 +56,7 @@ trait CmdTrait
      */
     protected function writeComment(OutputInterface $output, string $text): void
     {
-        $output->writeln("<comment>${$text}</comment>");
+        $output->writeln("<comment>" . $text . "</comment>");
     }
 
     /**
@@ -66,7 +66,7 @@ trait CmdTrait
      */
     private function writeln(OutputInterface $output, string $emoji, string $text, string $color = Colors::GREEN, string $keySuffix = ';options=bold'): void
     {
-        $output->writeln("<fg=${$color}${$keySuffix}>${$emoji} ${$text}</>");
+        $output->writeln('<fg=' . $color . $keySuffix . '>' . $emoji . ' ' . $text . '</>');
     }
 
 }
