@@ -1,0 +1,24 @@
+<?php
+$namespaceDefinition
+
+use $useClassName;
+use Illuminate\Database\Schema\Blueprint;
+
+class $className extends $baseClassName
+{
+    public function up()
+    {
+        $this->schema->create('table_name', function(Blueprint $table){
+            // Auto-increment id
+            $table->increments('id');
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        $this->schema->table('table_name', function(Blueprint $table){
+            $table->dropIfExists('table_name');
+        });
+    }
+}
