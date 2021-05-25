@@ -62,6 +62,15 @@ class WordpressController extends HotSauceController
         $this->finishingUp($input, $output, $appDirectory);
     }
 
+    public function symlink(string $sourceDir, string $distDir): void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->symlink(
+            $sourceDir,
+            $distDir
+        );
+    }
+
     /**
      * @param InputInterface $input
      *
@@ -269,17 +278,14 @@ class WordpressController extends HotSauceController
      * @param string $appDirectory
      * @param string $themeFolderName
      *
-     * @return $this
+     * @return void
      */
-    private function symlinkTheme(string $appDirectory, string $themeFolderName): self
+    private function symlinkTheme(string $appDirectory, string $themeFolderName): void
     {
-        $filesystem = new Filesystem();
-        $filesystem->symlink(
+        $this->symlink(
             $this->getThemeDirectory($appDirectory),
             $this->getWpThemesDirectory($appDirectory) . DIRECTORY_SEPARATOR . $themeFolderName
         );
-
-        return $this;
     }
 
     /**
