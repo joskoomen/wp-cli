@@ -40,5 +40,7 @@ class ServeCommand extends AbstractCommand
         $this->writeLink($output, 'Home','http://localhost:11001/');
         $this->writeLink($output, 'Admin','http://localhost:11001/wp-admin/');
         $this->runCommands($output, $directory, $commands);
+
+        return 0;
     }
 }

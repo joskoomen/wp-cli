@@ -33,5 +33,7 @@ class SyncAcfCommand extends AbstractCommand
         $appDirectory = $this->getDirectory($input);
         $controller = new AcfController();
         $controller->start($output, $appDirectory);
+
+        return 0;
     }
 }

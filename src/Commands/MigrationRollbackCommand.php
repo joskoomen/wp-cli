@@ -63,5 +63,7 @@ class MigrationRollbackCommand extends AbstractCommand
 
         $this->runCommands($output, $directory, $commands);
         $this->writeClose($output, '🎃', 'Rolled back!');
+
+        return 0;
     }
 }

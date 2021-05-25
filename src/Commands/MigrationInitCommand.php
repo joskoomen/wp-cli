@@ -27,6 +27,8 @@ class MigrationInitCommand extends AbstractCommand
     {
         $this->writeIntro($output, '🤩', 'Alrighty, migrations it is. What a smart choice 🖖.');
         $this->initMigrations($input, $output);
+
+        return 0;
     }
 
     protected function initMigrations(InputInterface $input, OutputInterface $output): MigrationInitCommand
