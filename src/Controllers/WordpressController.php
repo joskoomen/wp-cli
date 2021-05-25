@@ -62,7 +62,7 @@ class WordpressController extends HotSauceController
         $this->finishingUp($input, $output, $appDirectory);
     }
 
-    public function symlink(string $distDir, string $sourceDir): void
+    public function symlink(string $sourceDir, string $distDir): void
     {
         $filesystem = new Filesystem();
         $filesystem->symlink(
@@ -282,8 +282,7 @@ class WordpressController extends HotSauceController
      */
     private function symlinkTheme(string $appDirectory, string $themeFolderName): void
     {
-        $filesystem = new Filesystem();
-        $filesystem->symlink(
+        $this->symlink(
             $this->getThemeDirectory($appDirectory),
             $this->getWpThemesDirectory($appDirectory) . DIRECTORY_SEPARATOR . $themeFolderName
         );
