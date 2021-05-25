@@ -62,6 +62,15 @@ class WordpressController extends HotSauceController
         $this->finishingUp($input, $output, $appDirectory);
     }
 
+    public function symlink(string $distDir, string $sourceDir): void
+    {
+        $filesystem = new Filesystem();
+        $filesystem->symlink(
+            $sourceDir,
+            $distDir
+        );
+    }
+
     /**
      * @param InputInterface $input
      *
