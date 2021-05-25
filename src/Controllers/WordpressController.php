@@ -269,17 +269,15 @@ class WordpressController extends HotSauceController
      * @param string $appDirectory
      * @param string $themeFolderName
      *
-     * @return $this
+     * @return void
      */
-    private function symlinkTheme(string $appDirectory, string $themeFolderName): self
+    private function symlinkTheme(string $appDirectory, string $themeFolderName): void
     {
         $filesystem = new Filesystem();
         $filesystem->symlink(
             $this->getThemeDirectory($appDirectory),
             $this->getWpThemesDirectory($appDirectory) . DIRECTORY_SEPARATOR . $themeFolderName
         );
-
-        return $this;
     }
 
     /**
