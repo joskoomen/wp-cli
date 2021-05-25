@@ -38,6 +38,8 @@ class CreateCommand extends AbstractCommand
         $appDirectory = $this->getDirectory($input);
         $this->verifyApplicationDoesntExist($appDirectory);
         $this->startCrafting($input, $output, $appDirectory);
+
+        return 0;
     }
 
     /**

@@ -43,5 +43,7 @@ class SeedCommand extends AbstractCommand
         $this->runCommands($output, $directory, $commands);
 
         $this->writeClose($output, '🌴', 'All done. Ok bye!');
+
+        return 0;
     }
 }

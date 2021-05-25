@@ -38,5 +38,7 @@ class SeederMakeCommand extends AbstractCommand
         $this->runCommands($output, $directory, $commands);
 
         $this->writeClose($output, '🤙', 'All done');
+
+        return 0;
     }
 }

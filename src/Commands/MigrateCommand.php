@@ -58,5 +58,7 @@ class MigrateCommand extends AbstractCommand
         $this->runCommands($output, $directory, $commands);
 
         $this->writeClose($output, 👨🏻‍🦲, 'All done! Daniël thanks you!');
+
+        return 0;
     }
 }
