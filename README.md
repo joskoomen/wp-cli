@@ -19,6 +19,7 @@
 | ✅ | `php ypa-wp require [pluginname ...]` | Add plugin / plugins
 | ✅ | `php ypa-wp remove`                   | Remove plugins not listed in wordpress.json
 | ✅ | `php ypa-wp remove [pluginname ...]`  | ⬆️ Remove the given plugin / plugins
+| ✅ | `php ypa-wp list pluginname`          |️ List all available versions of the given plugin
 | ❌ | `php ypa-wp update`                   | Update plugins to latest version
 
 <br>
