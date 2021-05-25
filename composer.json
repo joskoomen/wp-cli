@@ -1,7 +1,7 @@
 {
   "name" : "ypa/wp-cli",
   "description" : "Wordpress CLI package.",
-  "version" : "1.0.2",
+  "version" : "1.0.3",
   "type" : "package",
   "license" : "MIT",
   "keywords" : [
@@ -26,6 +26,8 @@
     "symfony/console" : "^4.4",
     "symfony/filesystem" : "^4.4",
     "symfony/process" : "^4.4",
+    "symfony/dom-crawler": "^5.2",
+    "symfony/css-selector": "^5.2",
     "guzzlehttp/guzzle" : "^6.3",
     "vlucas/phpdotenv" : "^3.4",
     "wp-cli/wp-cli" : "^2.4",

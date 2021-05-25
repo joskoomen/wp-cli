@@ -3,6 +3,7 @@
 namespace Ypa\Wordpress\Cli\Controllers;
 
 use Ypa\Wordpress\Cli\Constants\Colors;
+use Ypa\Wordpress\Cli\Resources\PluginsResource;
 use Ypa\Wordpress\Cli\Services\WordpressService;
 use Ypa\Wordpress\Cli\Traits\CmdTrait;
 use Ypa\Wordpress\Cli\Traits\CreatorTrait;
@@ -38,7 +39,7 @@ class PluginsController
         $this->removeUnusedPlugins($output, $appDirectory, $plugins);
 
         foreach ($plugins as $name => $source) {
-            $this->writeMessage($output, '🔗', 'Installing "' . $name . '"',Colors::GREEN);
+            $this->writeMessage($output, '🔗', 'Installing "' . $name . '"');
 
             if ($source === '-') {
                 $filesystem = new Filesystem();
@@ -120,6 +121,14 @@ class PluginsController
         }
 
         return $this;
+    }
+
+    public function listVersions(OutputInterface $output, string $pluginName): void
+    {
+        $this->writeIntro($output, '🔎', 'Ok, we try to collect the available versions for ' . $pluginName . '.');
+        $resource = new PluginsResource($output);
+        $resource->listVersions($this->wordpressService, $pluginName);
+
     }
 
     /**
