@@ -74,8 +74,6 @@ class PluginsController
         $jsonFile = $this->getWpJsonPath($appDirectory);
         $plugins = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR)['plugins'];
 
-        $this->removeUnusedPlugins($output, $appDirectory, $plugins);
-
         foreach ($plugins as $name => $source) {
             $this->writeMessage($output, '🔗', 'Retrieve "' . $name . '"');
 
