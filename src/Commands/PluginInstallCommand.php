@@ -2,6 +2,8 @@
 
 namespace Ypa\Wordpress\Cli\Commands;
 
+use Symfony\Component\Console\Input\InputOption;
+use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Controllers\PluginsController;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,7 +19,8 @@ class PluginInstallCommand extends AbstractCommand
     {
         $this
             ->setName('install')
-            ->setDescription('Install the Wordpress plugins');
+            ->setDescription('Install the Wordpress plugins')
+            ->addOption(OptionNames::PRODUCTION, 'p', InputOption::VALUE_NONE, 'Optionally production mode');
         parent::configure();
     }
 
@@ -31,12 +34,14 @@ class PluginInstallCommand extends AbstractCommand
             throw new \RuntimeException('The Zip PHP extension is not installed. Please install it and try again.');
         }
 
-        $this->writeIntro($output, '🦁', "Ok, let's go! Installing your plugins.");
-
         $directory = $this->getDirectory($input);
         $creator = new PluginsController();
-        $creator->installPlugins($output, $directory);
 
+        if($this->hasOption($input, OptionNames::PRODUCTION)) {
+            $creator->collectPlugins($input, $output, $directory);
+        } else {
+            $creator->installPlugins($input, $output, $directory);
+        }
         return 0;
     }
 }

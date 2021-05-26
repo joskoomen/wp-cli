@@ -134,10 +134,13 @@ trait CreatorTrait
 
     protected function hasOption(InputInterface $input, string $name): bool
     {
-        if ($input->getOption($name) === null) {
-            return true;
-        }
+        if ($input->hasOption($name)) {
+            if ($input->getOption($name) === null) {
+                return true;
+            }
 
-        return !($input->getOption($name) === false);
+            return !($input->getOption($name) === false);
+        }
+        return false;
     }
 }
