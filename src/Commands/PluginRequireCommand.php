@@ -2,7 +2,6 @@
 
 namespace Ypa\Wordpress\Cli\Commands;
 
-use Ypa\Wordpress\Cli\Constants\Colors;
 use Ypa\Wordpress\Cli\Controllers\PluginsController;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,8 +38,8 @@ class PluginRequireCommand extends AbstractCommand
         $plugins = $input->getArgument('plugins');
 
         foreach ($plugins as $plugin) {
-            $this->writeMessage($output, '🔗', 'Installing "' . $plugin . '"', Colors::GREEN);
-            $creator->requirePlugin($output, $plugin, $directory);
+            $this->writeMessage($output, '🔗', 'Installing "' . $plugin . '"');
+            $creator->requirePlugin($input, $output, $plugin, $directory);
         }
         return 0;
     }

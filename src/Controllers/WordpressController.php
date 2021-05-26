@@ -2,8 +2,8 @@
 
 namespace Ypa\Wordpress\Cli\Controllers;
 
+use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Services\WordpressService;
-use GuzzleHttp\Client;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -294,6 +294,7 @@ class WordpressController extends HotSauceController
      * @param string $appDirectory
      *
      * @return WordpressController
+     * @throws \JsonException
      */
     private function installAndActivate(InputInterface $input, OutputInterface $output, string $appDirectory): self
     {
@@ -316,9 +317,9 @@ class WordpressController extends HotSauceController
         ];
         $this->runCommands($output, $appDirectory, $commands);
 
-        if ($this->hasOption($input, 'install')) {
+        if ($this->hasOption($input, OptionNames::INSTALL)) {
             $plugins = new PluginsController();
-            $plugins->installPlugins($output, $appDirectory);
+            $plugins->installPlugins($input, $output, $appDirectory);
         }
 
         $output->writeln('<fg=green;options=bold>🥳 You\'re done</>.');
@@ -328,7 +329,7 @@ class WordpressController extends HotSauceController
         $output->writeln('<comment>🤠 Your wp-admin username 👉 </comment> admin');
         $output->writeln('<comment>🤠 Your wp-admin password 👉 </comment> Yarno123!');
         $output->writeln('<fg=cyan;options=bold>🚀 To start try to run one of the following commands:</>');
-        if (!$this->hasOption($input, 'install')) {
+        if (!$this->hasOption($input, OptionNames::INSTALL)) {
             $output->writeln('<comment>👉 php ypa-wp install</comment> to install your plugins');
         }
         $output->writeln('<comment>👉 php ypa-wp serve</comment> to run your localhost');
@@ -343,13 +344,14 @@ class WordpressController extends HotSauceController
      * @param OutputInterface $output
      * @param string $appDirectory
      *
-     * @return $thiss
+     * @return void
+     * @throws \JsonException
      */
-    private function finishingUp(InputInterface $input, OutputInterface $output, string $appDirectory): self
+    private function finishingUp(InputInterface $input, OutputInterface $output, string $appDirectory): void
     {
         $this->rcopy($this->getTempWpDirectory($appDirectory), $this->getWordpressDirectory($appDirectory));
         $this->rrmdir($this->getTempWpDirectory($appDirectory));
 
-        return $this->installAndActivate($input, $output, $appDirectory);
+        $this->installAndActivate($input, $output, $appDirectory);
     }
 }

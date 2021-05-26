@@ -2,7 +2,10 @@
 
 namespace Ypa\Wordpress\Cli\Controllers;
 
+use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Console\Input\InputInterface;
 use Ypa\Wordpress\Cli\Constants\Colors;
+use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Resources\PluginsResource;
 use Ypa\Wordpress\Cli\Services\WordpressService;
 use Ypa\Wordpress\Cli\Traits\CmdTrait;
@@ -23,13 +26,14 @@ class PluginsController
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
      * @param string $appDirectory
      *
      * @return $this
      * @throws \JsonException
      */
-    public function installPlugins(OutputInterface $output, string $appDirectory): self
+    public function installPlugins(InputInterface $input, OutputInterface $output, string $appDirectory): self
     {
         $this->writeMessage($output, '🔌', 'Syncing your plugins...', Colors::GREEN, true);
 
@@ -47,9 +51,36 @@ class PluginsController
                     $this->getCustomPluginsDirectory($appDirectory) . DIRECTORY_SEPARATOR . $name,
                     $this->getPluginsDirectory($appDirectory) . DIRECTORY_SEPARATOR . $name
                 );
-                $this->activatePlugin($output, $name, $appDirectory);
+                $this->activatePlugin($input, $output, $name, $appDirectory);
             } else {
-                $this->getPlugin($output, $name, $source, $appDirectory);
+                $this->getPlugin($input, $output, $name, $source, $appDirectory);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param string $appDirectory
+     *
+     * @return $this
+     * @throws \JsonException
+     */
+    public function collectPlugins(InputInterface $input, OutputInterface $output, string $appDirectory): self
+    {
+        $this->writeMessage($output, '🔌', 'Syncing your plugins...', Colors::GREEN, true);
+
+        $jsonFile = $this->getWpJsonPath($appDirectory);
+        $plugins = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR)['plugins'];
+
+        $this->removeUnusedPlugins($output, $appDirectory, $plugins);
+
+        foreach ($plugins as $name => $source) {
+            $this->writeMessage($output, '🔗', 'Retrieve "' . $name . '"');
+
+            if ($source !== '-') {
+                $this->getPlugin($input, $output, $name, $source, $appDirectory);
             }
         }
         return $this;
@@ -85,11 +116,16 @@ class PluginsController
     }
 
     /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param string $name
+     * @param string $appDirectory
+     *
      * @throws \JsonException
      */
-    public function requirePlugin(OutputInterface $output, string $name, string $appDirectory): void
+    public function requirePlugin(InputInterface $input, OutputInterface $output, string $name, string $appDirectory): void
     {
-        $this->getPlugin($output, $name, '', $appDirectory)
+        $this->getPlugin($input, $output, $name, '', $appDirectory)
             ->addToJsonFile($output, $name, $appDirectory);
     }
 
@@ -132,6 +168,7 @@ class PluginsController
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
      * @param string $name
      * @param string $source
@@ -139,7 +176,7 @@ class PluginsController
      *
      * @return PluginsController
      */
-    private function getPlugin(OutputInterface $output, string $name, string $source, string $appDirectory): self
+    private function getPlugin(InputInterface $input, OutputInterface $output, string $name, string $source, string $appDirectory): self
     {
         $zipFile = $this->makeFilename('plugin-' . $name);
         if (empty($source)) {
@@ -150,11 +187,19 @@ class PluginsController
             $zipSource = $source;
         }
 
+        if ($this->hasOption($input, OptionNames::PRODUCTION)) {
+            $extractDir = $this->getCustomPluginsDirectory($appDirectory);
+        } else {
+            $extractDir = $this->getPluginsDirectory($appDirectory);
+        }
+
         $this->downloadPlugin($zipFile, $zipSource)
-            ->extract($zipFile, $this->getPluginsDirectory($appDirectory))
+            ->extract($zipFile, $extractDir)
             ->cleanUp($zipFile);
 
-        $this->activatePlugin($output, $name, $appDirectory);
+        if (!$this->hasOption($input, OptionNames::PRODUCTION)) {
+            $this->activatePlugin($input, $output, $name, $appDirectory);
+        }
         return $this;
     }
 
@@ -191,17 +236,20 @@ class PluginsController
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
      * @param string $name
      * @param string $appDirectory
      */
-    private function activatePlugin(OutputInterface $output, string $name, string $appDirectory): void
+    private function activatePlugin(InputInterface $input, OutputInterface $output, string $name, string $appDirectory): void
     {
-        $cliPath = $this->getWpCliPath($appDirectory);
-        $commands = [
-            $cliPath . ' plugin activate ' . $name . ' --path=' . $this->getWordpressDirectory($appDirectory) . ' --quiet',
-        ];
-        $this->runCommands($output, $appDirectory, $commands);
+        if (!$this->hasOption($input, OptionNames::PRODUCTION)) {
+            $cliPath = $this->getWpCliPath($appDirectory);
+            $commands = [
+                $cliPath . ' plugin activate ' . $name . ' --path=' . $this->getWordpressDirectory($appDirectory) . ' --quiet',
+            ];
+            $this->runCommands($output, $appDirectory, $commands);
+        }
     }
 
     /**
@@ -241,7 +289,12 @@ class PluginsController
         file_put_contents($jsonFile, json_encode($jsonData, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 
-    private function getCustomPluginsDirectory(string $appDirectory): string
+    /**
+     * @param string $appDirectory
+     *
+     * @return string
+     */
+    #[Pure] private function getCustomPluginsDirectory(string $appDirectory): string
     {
         return $this->getResourcesDirectory($appDirectory) . DIRECTORY_SEPARATOR . 'plugins';
     }
