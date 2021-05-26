@@ -294,7 +294,7 @@ class PluginsController
      *
      * @return string
      */
-    #[Pure] private function getCustomPluginsDirectory(string $appDirectory): string
+    private function getCustomPluginsDirectory(string $appDirectory): string
     {
         return $this->getResourcesDirectory($appDirectory) . DIRECTORY_SEPARATOR . 'plugins';
     }
