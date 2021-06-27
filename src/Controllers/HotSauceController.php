@@ -62,10 +62,12 @@ class HotSauceController
         @copy($resourcesDirectory . '.env.example', $directory . '.env.example');
         @copy($resourcesDirectory . '.env.example', $directory . '.env');
         @copy($directory . '_gitignore', $directory . '.gitignore');
+        @copy($directory . '_htaccess', $directory . '.htaccess.example');
 
         @unlink($resourcesDirectory . 'wordpress.json');
         @unlink($resourcesDirectory . '.env.example');
         @unlink($directory . '_gitignore');
+        @unlink($directory . '_htaccess');
 
         return $this;
     }
