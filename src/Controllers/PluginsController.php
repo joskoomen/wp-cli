@@ -2,7 +2,6 @@
 
 namespace Ypa\Wordpress\Cli\Controllers;
 
-use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Console\Input\InputInterface;
 use Ypa\Wordpress\Cli\Constants\Colors;
 use Ypa\Wordpress\Cli\Constants\OptionNames;

@@ -123,24 +123,24 @@ class WordpressController extends HotSauceController
     /**
      * @param $directory
      *
-     * @return string
+     * @return void
      */
-    private function updateWordpressVersion(string $appDirectory): string
+    private function updateWordpressVersion(string $appDirectory): void
     {
         $versionFile = $this->getTempWpDirectory($appDirectory) . DIRECTORY_SEPARATOR . 'wp-includes' . DIRECTORY_SEPARATOR . 'version.php';
-        $wpjsonFile = $this->getWpJsonPath($appDirectory);
+        $wpJsonFile = $this->getWpJsonPath($appDirectory);
 
         $string = @file_get_contents($versionFile);
-        $wp_json = @file_get_contents($wpjsonFile);
+        $wpJson = @file_get_contents($wpJsonFile);
 
         preg_match('/(\$wp_version)/', $string, $matches, PREG_OFFSET_CAPTURE);
         $version = @explode(' = ', @substr($string, $matches[0][1], 37))[1];
+        if (strpos($wpJson, '"version":') !== false) {
+            $string = @str_replace('"plugins"', '"version": ' . str_replace("'", '"', $version) . ",\n\t" . '"plugins"', $wpJson);
+        }
 
-        $string = str_replace('"plugins"', '"version": ' . str_replace("'", '"', $version) . ",\n\t" . '"plugins"', $wp_json);
+        @file_put_contents($wpJsonFile, $string);
 
-        @file_put_contents($wpjsonFile, $string);
-
-        return $version;
     }
 
     /**
@@ -293,10 +293,10 @@ class WordpressController extends HotSauceController
      * @param OutputInterface $output
      * @param string $appDirectory
      *
-     * @return WordpressController
+     * @return void
      * @throws \JsonException
      */
-    private function installAndActivate(InputInterface $input, OutputInterface $output, string $appDirectory): self
+    private function installAndActivate(InputInterface $input, OutputInterface $output, string $appDirectory): void
     {
         $themeFolderName = strtolower(str_replace(' ', '-', $this->projectName));
 
@@ -336,7 +336,6 @@ class WordpressController extends HotSauceController
         $output->writeln('<comment>👉 php ypa-wp db:init</comment> to start with migrations');
         $output->writeln('<comment>👉 php ypa-wp require your-pluginname</comment> to add a new plugin');
         $output->writeln('<comment>👉 php ypa-wp require your-pluginname another-plugin-name</comment> to add multiple plugins');
-        return $this;
     }
 
     /**
