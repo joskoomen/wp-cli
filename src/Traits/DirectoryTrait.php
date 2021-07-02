@@ -90,4 +90,9 @@ trait DirectoryTrait
     {
         return $directory . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Migrations';
     }
+
+    protected function getDbBackupsDirectory($directory): string
+    {
+        return $directory . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'backups';
+    }
 }
