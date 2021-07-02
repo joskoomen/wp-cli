@@ -34,7 +34,7 @@ class PullDatabaseCommand extends AbstractCommand
             0
         );
         $hasAdmin = $helper->ask($input, $output, $question);
-        if ($hasAdmin === 'yes') {
+        if (strtolower($hasAdmin) === 'yes') {
             $this->writeIntro($output, '🐨', "Ok, let's pull the remote database and install it locally...");
             $controller = new DatabaseController();
             $appDirectory = $this->getDirectory($input);
@@ -43,12 +43,11 @@ class PullDatabaseCommand extends AbstractCommand
 
             $controller->pullRemoteDatabase($output, $appDirectory, $remoteFile);
 
-            $this->writeClose($output, '🐨', "Enjoy your new data set!");
+            $this->writeClose($output, '🐨', 'Enjoy your new data set!');
             return 0;
         }
 
         throw new \RuntimeException('Make sure you have an admin user on the remote Database first!');
 
     }
-
 }

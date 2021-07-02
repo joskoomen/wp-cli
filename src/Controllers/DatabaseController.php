@@ -25,7 +25,7 @@ class DatabaseController
     public function createBackupDirectory(OutputInterface $output, string $appDirectory): void
     {
         if (!$this->backupDirectoryDoesExist($appDirectory)) {
-            $this->writeMessage($output, '🐨', "Create the backup folder first inside databases/ ...");
+            $this->writeMessage($output, '🐨', 'Create the backup folder first inside databases/ ...');
             $fileSystem = new Filesystem();
             $fileSystem->mkdir($this->getDbBackupsDirectory($appDirectory));
         }
@@ -38,8 +38,8 @@ class DatabaseController
 
     public function startBackup(OutputInterface $output, string $appDirectory): string
     {
-        $this->writeMessage($output, '🐨', "Start backup");
-        $dotenv = Dotenv::create(dirname(__DIR__, 1));
+        $this->writeMessage($output, '🐨', 'Start backup');
+        $dotenv = Dotenv::create(dirname(__DIR__, 5));
         $dotenv->load();
 
         $fileSystem = new Filesystem();
@@ -73,7 +73,7 @@ class DatabaseController
 
     public function pullRemoteDatabase(OutputInterface $output, string $appDirectory, string $remoteFile): void
     {
-        $dotenv = Dotenv::create(dirname(__DIR__, 1));
+        $dotenv = Dotenv::create(dirname(__DIR__, 5));
         $dotenv->load();
 
         $dbHost = getenv('DB_HOST');
