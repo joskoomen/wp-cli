@@ -259,7 +259,7 @@ class PluginsController
     private function addToJsonFile(OutputInterface $output, string $name, string $appDirectory): void
     {
         $jsonFile = $appDirectory . DIRECTORY_SEPARATOR . 'wordpress.json';
-        $jsonData = json_decode(file_get_contents($jsonFile));
+        $jsonData = json_decode(file_get_contents($jsonFile), true);
 
         $plugins = $jsonData['plugins'];
         $plugins[$name] = $this->getPluginVersion($output, $appDirectory, $name);
