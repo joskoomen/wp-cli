@@ -36,7 +36,7 @@ class WordpressService
      */
     public function checkLatestVersion(): string
     {
-        $json = json_decode(file_get_contents('https://api.wordpress.org/core/version-check/1.7/'), true, 512, JSON_THROW_ON_ERROR);
+        $json = json_decode(file_get_contents('https://api.wordpress.org/core/version-check/1.7/'), true);
         return $json['offers'][0]['version'];
     }
 

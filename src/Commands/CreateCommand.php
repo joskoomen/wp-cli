@@ -56,7 +56,7 @@ class CreateCommand extends AbstractCommand
         $file = file_get_contents($wpJsonFile) ?? '';
         $projectName = '';
         if (!empty($file)) {
-            $json = json_decode($file, true, 512, JSON_THROW_ON_ERROR);
+            $json = json_decode($file, true);
             $projectName = $json['name'] ?? '';
         }
 

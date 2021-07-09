@@ -34,7 +34,7 @@ class PluginRemoveCommand extends AbstractCommand
 
         if (empty($plugins)) {
             $jsonFile = $directory . DIRECTORY_SEPARATOR . 'wordpress.json';
-            $arr = json_decode(file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR)['plugins'];
+            $arr = json_decode(file_get_contents($jsonFile), true)['plugins'];
             $creator->removeUnusedPlugins($output, $directory, $arr);
         } else {
             foreach ($plugins as $plugin) {

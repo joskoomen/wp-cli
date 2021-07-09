@@ -89,7 +89,7 @@ class WordpressController extends HotSauceController
 
         $wpJsonFile = $this->getWpJsonPath($this->getDirectory($input));
         try {
-            $json = json_decode(file_get_contents($wpJsonFile), true, 512, JSON_THROW_ON_ERROR);
+            $json = json_decode(file_get_contents($wpJsonFile));
             $version = $json['version'];
         } catch (\Exception $e) {
             $version = $this->wordpressService->checkLatestVersion();
