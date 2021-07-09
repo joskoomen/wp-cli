@@ -135,12 +135,11 @@ class WordpressController extends HotSauceController
 
         preg_match('/(\$wp_version)/', $string, $matches, PREG_OFFSET_CAPTURE);
         $version = @explode(' = ', @substr($string, $matches[0][1], 37))[1];
-        if (strpos($wpJson, '"version":') !== false) {
-            $string = @str_replace('"plugins"', '"version": ' . str_replace("'", '"', $version) . ",\n\t" . '"plugins"', $wpJson);
-        }
 
-        @file_put_contents($wpJsonFile, $string);
+        $jsonData = json_decode(file_get_contents($wpJson), true);
+        $jsonData['version'] = (string)$version;
 
+        @file_put_contents($wpJsonFile, json_encode($jsonData, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 
     /**
