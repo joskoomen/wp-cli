@@ -37,7 +37,7 @@ class PluginsController
         $this->writeMessage($output, '🔌', 'Syncing your plugins...', Colors::GREEN, true);
 
         $jsonFile = $this->getWpJsonPath($appDirectory);
-        $plugins = json_decode(file_get_contents($jsonFile), true)['plugins'];
+        $plugins = @json_decode(@file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR)['plugins'];
 
         $this->removeUnusedPlugins($output, $appDirectory, $plugins);
 
@@ -71,7 +71,7 @@ class PluginsController
         $this->writeMessage($output, '🔌', 'Syncing your plugins...', Colors::GREEN, true);
 
         $jsonFile = $this->getWpJsonPath($appDirectory);
-        $plugins = json_decode(file_get_contents($jsonFile), true)['plugins'];
+        $plugins = @json_decode(@file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR)['plugins'];
 
         foreach ($plugins as $name => $source) {
             $this->writeMessage($output, '🔗', 'Retrieve "' . $name . '"');
@@ -259,7 +259,7 @@ class PluginsController
     private function addToJsonFile(OutputInterface $output, string $name, string $appDirectory): void
     {
         $jsonFile = $appDirectory . DIRECTORY_SEPARATOR . 'wordpress.json';
-        $jsonData = json_decode(file_get_contents($jsonFile), true);
+        $jsonData = @json_decode(@file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
 
         $plugins = $jsonData['plugins'];
         $plugins[$name] = $this->getPluginVersion($output, $appDirectory, $name);
@@ -277,7 +277,7 @@ class PluginsController
     private function removeFromJsonFile(string $name, string $appDirectory): void
     {
         $jsonFile = $appDirectory . DIRECTORY_SEPARATOR . 'wordpress.json';
-        $jsonData = json_decode(file_get_contents($jsonFile), true);
+        $jsonData = @json_decode(@file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
 
         $plugins = $jsonData['plugins'];
         unset($plugins[$name]);

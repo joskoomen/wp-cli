@@ -2,6 +2,9 @@
 
 namespace Ypa\Wordpress\Cli\Controllers;
 
+use Exception;
+use JsonException;
+use RuntimeException;
 use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Services\WordpressService;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +24,7 @@ class WordpressController extends HotSauceController
     private string $dbPrefix;
     private WordpressService $wordpressService;
 
-    public function __construct($projectName = null, $adminEmail = null, $dbHost = 'localhost', $dbName = null, $dbUser = null, $dbPass = null, $dbPrefix = 'wp_')
+    public function __construct($projectName = 'YPA', $adminEmail = '', $dbHost = 'localhost', $dbName = '', $dbUser = '', $dbPass = '', $dbPrefix = 'wp_')
     {
         parent::__construct();
 
@@ -40,7 +43,7 @@ class WordpressController extends HotSauceController
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function start(InputInterface $input, OutputInterface $output): void
     {
@@ -56,7 +59,7 @@ class WordpressController extends HotSauceController
             $this->installHotSauce($output, $appDirectory);
         }
         $this->updateConfig($output, $appDirectory)
-            ->updateSaltKeys($wpDirectory . 'wp-config.php', $output);
+            ->updateSaltKeys($wpDirectory . 'wp-config.php');
         $this->setThemeName($appDirectory)
             ->updateWordpressVersion($appDirectory);
         $this->finishingUp($input, $output, $appDirectory);
@@ -75,7 +78,7 @@ class WordpressController extends HotSauceController
      * @param InputInterface $input
      *
      * @return bool|mixed|string|string[]|null
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getVersion(InputInterface $input): string
     {
@@ -89,9 +92,9 @@ class WordpressController extends HotSauceController
 
         $wpJsonFile = $this->getWpJsonPath($this->getDirectory($input));
         try {
-            $json = json_decode(file_get_contents($wpJsonFile));
+            $json = @json_decode(@file_get_contents($wpJsonFile), true, 512, JSON_THROW_ON_ERROR);
             $version = $json['version'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $version = $this->wordpressService->checkLatestVersion();
         }
 
@@ -114,16 +117,17 @@ class WordpressController extends HotSauceController
             $filesystem->chmod($wpContentDirectory . DIRECTORY_SEPARATOR . 'uploads', 0777, 0000, true);
             $filesystem->chmod($wpContentDirectory . DIRECTORY_SEPARATOR . 'plugins', 0777, 0000, true);
         } catch (IOExceptionInterface $e) {
-            $output->writeComment('You should verify that the "wp-content/uploads" directory is writable.');
+            $this->writeComment($output, 'You should verify that the "wp-content/uploads" directory is writable.');
         }
 
         return $this;
     }
 
     /**
-     * @param $directory
+     * @param string $appDirectory
      *
      * @return void
+     * @throws JsonException
      */
     private function updateWordpressVersion(string $appDirectory): void
     {
@@ -136,14 +140,18 @@ class WordpressController extends HotSauceController
         preg_match('/(\$wp_version)/', $string, $matches, PREG_OFFSET_CAPTURE);
         $version = @explode(' = ', @substr($string, $matches[0][1], 37))[1];
 
-        $jsonData = json_decode(file_get_contents($wpJson), true);
-        $jsonData['version'] = (string)$version;
+        $json = [];
+        $jsonData = @json_decode($wpJson, true, 512, JSON_THROW_ON_ERROR);
+        $json['name'] = $jsonData['name'];
+        $json['description'] = $jsonData['description'];
+        $json['version'] = str_replace("'", '', (string)$version);
+        $json['plugins'] = $jsonData['plugins'];
 
-        @file_put_contents($wpJsonFile, json_encode($jsonData, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        @file_put_contents($wpJsonFile, @json_encode($json, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 
     /**
-     * @param $directory
+     * @param string $appDirectory
      *
      * @return WordpressController
      */
@@ -171,9 +179,9 @@ class WordpressController extends HotSauceController
      * @param string $appDirectory
      * @param string $version
      *
-     * @return $this
+     * @return void
      */
-    private function installWordpress(OutputInterface $output, string $appDirectory, string $version = 'latest'): self
+    private function installWordpress(OutputInterface $output, string $appDirectory, string $version = 'latest'): void
     {
         $this->writeMessage($output, '🎉', 'Downloading Wordpress...');
 
@@ -182,7 +190,6 @@ class WordpressController extends HotSauceController
             ->prepareWritableDirectories($appDirectory, $output)
             ->cleanUp($zipFile);
 
-        return $this;
     }
 
     /**
@@ -201,11 +208,10 @@ class WordpressController extends HotSauceController
 
     /**
      * @param $wpConfig
-     * @param OutputInterface $output
      *
-     * @return WordpressController
+     * @return void
      */
-    private function updateSaltKeys($wpConfig, OutputInterface $output): self
+    private function updateSaltKeys($wpConfig): void
     {
         $salt = $this->wordpressService->getWpSaltSections();
         $config = @file_get_contents($wpConfig);
@@ -225,14 +231,13 @@ class WordpressController extends HotSauceController
         for ($i = 0, $iMax = count($originals); $i < $iMax; $i++) {
             try {
                 $config = @str_replace($originals[$i], $new[$i], $config);
-            } catch (\Exception $e) {
-                throw new \RuntimeException($originals[$i] . ' could not be updated in wp-config.php');
+            } catch (Exception $e) {
+                throw new RuntimeException($originals[$i] . ' could not be updated in wp-config.php');
             }
         }
 
         @file_put_contents($wpConfig, $config);
 
-        return $this;
     }
 
     /**
@@ -293,7 +298,7 @@ class WordpressController extends HotSauceController
      * @param string $appDirectory
      *
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function installAndActivate(InputInterface $input, OutputInterface $output, string $appDirectory): void
     {
@@ -343,7 +348,7 @@ class WordpressController extends HotSauceController
      * @param string $appDirectory
      *
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function finishingUp(InputInterface $input, OutputInterface $output, string $appDirectory): void
     {

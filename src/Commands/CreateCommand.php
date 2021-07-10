@@ -53,10 +53,10 @@ class CreateCommand extends AbstractCommand
         $helper = $this->getHelper('question');
         $wpJsonFile = $this->getWpJsonPath($appDirectory);
 
-        $file = file_get_contents($wpJsonFile) ?? '';
+        $file = @file_get_contents($wpJsonFile) ?? '';
         $projectName = '';
         if (!empty($file)) {
-            $json = json_decode($file, true);
+            $json = @json_decode($file, true, 512, JSON_THROW_ON_ERROR);
             $projectName = $json['name'] ?? '';
         }
 
