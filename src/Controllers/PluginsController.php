@@ -3,15 +3,16 @@
 namespace Ypa\Wordpress\Cli\Controllers;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Ypa\Wordpress\Cli\Constants\Colors;
 use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Resources\PluginsResource;
+use Ypa\Wordpress\Cli\Services\SearchPluginService;
 use Ypa\Wordpress\Cli\Services\WordpressService;
 use Ypa\Wordpress\Cli\Traits\CmdTrait;
 use Ypa\Wordpress\Cli\Traits\CreatorTrait;
 use Ypa\Wordpress\Cli\Traits\DirectoryTrait;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 class PluginsController
 {
@@ -122,8 +123,20 @@ class PluginsController
      */
     public function requirePlugin(InputInterface $input, OutputInterface $output, string $name, string $appDirectory): void
     {
-        $this->getPlugin($input, $output, $name, '', $appDirectory)
-            ->addToJsonFile($output, $name, $appDirectory);
+        $service = new SearchPluginService();
+        $data = $service->searchPlugin($name);
+
+        $first = $data['plugins'][0];
+        if ($first['slug'] === $name) {
+            $this->getPlugin($input, $output, $name, $first['download_link'], $appDirectory)
+                ->addToJsonFile($output, $name, $appDirectory);
+        } else {
+            $this->writeln($output, '🤷🏼‍♂️', 'No plugin found with slug ' . $name, Colors::RED);
+            $max = count($data['plugins']);
+            for ($index = 1; $index < $max; $index++) {
+                $this->writeln($output, '👉️', $data['plugins'][$index]['slug']);
+            }
+        }
     }
 
     /**
@@ -228,7 +241,7 @@ class PluginsController
      */
     private function downloadPlugin(string $zipFile, string $downloadUrl): self
     {
-        file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrl));
+        @file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrl));
         return $this;
     }
 
