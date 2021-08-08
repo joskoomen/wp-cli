@@ -62,7 +62,7 @@ class WordpressService
 
     public function getWpSaltSections(): string
     {
-        return file_get_contents('https://api.wordpress.org/secret-key/1.1/salt/');
+        return @file_get_contents('https://api.wordpress.org/secret-key/1.1/salt/');
     }
 
     public function getPluginAdvancedData(string $pluginName): string

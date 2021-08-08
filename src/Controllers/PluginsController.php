@@ -8,7 +8,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Ypa\Wordpress\Cli\Constants\Colors;
 use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Resources\PluginsResource;
-use Ypa\Wordpress\Cli\Services\SearchPluginService;
 use Ypa\Wordpress\Cli\Services\WordpressService;
 use Ypa\Wordpress\Cli\Traits\CmdTrait;
 use Ypa\Wordpress\Cli\Traits\CreatorTrait;
@@ -123,18 +122,28 @@ class PluginsController
      */
     public function requirePlugin(InputInterface $input, OutputInterface $output, string $name, string $appDirectory): void
     {
-        $service = new SearchPluginService();
-        $data = $service->searchPlugin($name);
+        $cliPath = $this->getWpCliPath($appDirectory);
+        $cli = $cliPath . ' plugin search ' . $name . ' --path=' . $this->getWordpressDirectory($appDirectory);
+        $commands = [
+            $cli . ' --per-page=4 --page=1 --format=json --fields=name,version,slug'
+        ];
+        $resultsJson = $this->runCommands($output, $appDirectory, $commands, false, true);
 
-        $first = $data['plugins'][0];
-        if ($first['slug'] === $name) {
-            $this->getPlugin($input, $output, $name, $first['download_link'], $appDirectory)
-                ->addToJsonFile($output, $name, $appDirectory);
-        } else {
-            $this->writeln($output, '🤷🏼‍♂️', 'No plugin found with slug ' . $name, Colors::RED);
-            $max = count($data['plugins']);
-            for ($index = 1; $index < $max; $index++) {
-                $this->writeln($output, '👉️', $data['plugins'][$index]['slug']);
+        $data = json_decode($resultsJson, true, 512, JSON_THROW_ON_ERROR);
+        $max = count($data);
+
+        if ($max >= 1) {
+            $first = $data[0];
+            if ($first['slug'] === $name) {
+                $this->getPlugin($input, $output, $first['slug'], $first['version'], $appDirectory)
+                    ->addToJsonFile($output, $name, $appDirectory);
+                $this->writeln($output, '✅️', $first['name'] . ' installed');
+            } else {
+                $this->writeln($output, '🤷‍️', 'No plugin found with slug ' . $name, Colors::RED);
+                for ($index = 1; $index < $max; $index++) {
+                    $this->writeln($output, '💡', 'Maybe you mean: ' . $data[$index]['name'], Colors::RED, '');
+                    $this->writeln($output, '👉️', 'php ypa-wp require ' . $data[$index]['slug'], Colors::MAGENTA);
+                }
             }
         }
     }
