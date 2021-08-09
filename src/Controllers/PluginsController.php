@@ -129,7 +129,7 @@ class PluginsController
         ];
         $resultsJson = $this->runCommands($output, $appDirectory, $commands, false, true);
 
-        $data = json_decode($resultsJson, true, 512, JSON_THROW_ON_ERROR);
+        $data = @json_decode($resultsJson, true, 512, JSON_THROW_ON_ERROR);
         $max = count($data);
 
         if ($max >= 1) {
