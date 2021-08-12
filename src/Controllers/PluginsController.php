@@ -317,4 +317,18 @@ class PluginsController
     {
         return $this->getResourcesDirectory($appDirectory) . DIRECTORY_SEPARATOR . 'plugins';
     }
+
+    /**
+     * @throws \JsonException
+     */
+    private function getInstalledPlugins(OutputInterface $output, string $appDirectory): array
+    {
+        $cliPath = $this->getWpCliPath($appDirectory);
+        $commands = [
+            $cliPath . ' plugin list --path=' . $this->getWordpressDirectory($appDirectory) . ' --format=json',
+        ];
+        $installed = $this->runCommands($output, $appDirectory, $commands, false, true);
+        $installedPlugins = @json_decode($installed, true, 512, JSON_THROW_ON_ERROR);
+        return $installedPlugins ?? [];
+    }
 }
