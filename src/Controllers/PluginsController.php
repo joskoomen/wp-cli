@@ -3,6 +3,8 @@
 namespace Ypa\Wordpress\Cli\Controllers;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Ypa\Wordpress\Cli\Constants\Colors;
 use Ypa\Wordpress\Cli\Constants\OptionNames;
 use Ypa\Wordpress\Cli\Resources\PluginsResource;
@@ -10,8 +12,6 @@ use Ypa\Wordpress\Cli\Services\WordpressService;
 use Ypa\Wordpress\Cli\Traits\CmdTrait;
 use Ypa\Wordpress\Cli\Traits\CreatorTrait;
 use Ypa\Wordpress\Cli\Traits\DirectoryTrait;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 class PluginsController
 {
@@ -41,18 +41,30 @@ class PluginsController
 
         $this->removeUnusedPlugins($output, $appDirectory, $plugins);
 
-        foreach ($plugins as $name => $source) {
-            $this->writeMessage($output, '🔗', 'Installing "' . $name . '"');
+        $installedPlugins = $this->getInstalledPlugins($output, $appDirectory);
 
-            if ($source === '-') {
-                $filesystem = new Filesystem();
-                $filesystem->symlink(
-                    $this->getCustomPluginsDirectory($appDirectory) . DIRECTORY_SEPARATOR . $name,
-                    $this->getPluginsDirectory($appDirectory) . DIRECTORY_SEPARATOR . $name
-                );
-                $this->activatePlugin($input, $output, $name, $appDirectory);
-            } else {
-                $this->getPlugin($input, $output, $name, $source, $appDirectory);
+        foreach ($plugins as $name => $source) {
+            $install = true;
+            foreach ($installedPlugins as $installedPlugin) {
+                if ($name === $installedPlugin['name']) {
+                    $install = false;
+                    break;
+                }
+            }
+
+            if ($install) {
+                $this->writeMessage($output, '🔗', 'Installing "' . $name . '"');
+
+                if ($source === '-') {
+                    $filesystem = new Filesystem();
+                    $filesystem->symlink(
+                        $this->getCustomPluginsDirectory($appDirectory) . DIRECTORY_SEPARATOR . $name,
+                        $this->getPluginsDirectory($appDirectory) . DIRECTORY_SEPARATOR . $name
+                    );
+                    $this->activatePlugin($input, $output, $name, $appDirectory);
+                } else {
+                    $this->getPlugin($input, $output, $name, $source, $appDirectory);
+                }
             }
         }
         return $this;
@@ -113,6 +125,43 @@ class PluginsController
     }
 
     /**
+     * @param OutputInterface $output
+     * @param string $appDirectory
+     *
+     * @throws \JsonException
+     */
+    public function updatePlugins(OutputInterface $output, string $appDirectory): void
+    {
+        $installedPlugins = $this->getInstalledPlugins($output, $appDirectory);
+        $jsonFile = $this->getWpJsonPath($appDirectory);
+        $jsonData = @json_decode(@file_get_contents($jsonFile), true, 512, JSON_THROW_ON_ERROR);
+
+        $plugins = [];
+        foreach ($installedPlugins as $plugin) {
+            if (isset($jsonData['plugins'][$plugin['name']])) {
+                if ($jsonData['plugins'][$plugin['name']] === '-') {
+                    $plugins[$plugin['name']] = '-';
+                } elseif (strpos('http', $jsonData['plugins'][$plugin['name']]) === 0) {
+                    $plugins[$plugin['name']] = $jsonData['plugins'][$plugin['name']];
+                } else {
+                    $plugins[$plugin['name']] = $plugin['version'];
+                    if ($jsonData['plugins'][$plugin['name']] !== $plugin['version']) {
+                        $this->writeln($output, '🐨', 'Update "' . $plugin['name'] . '" : ' . $plugin['version'], Colors::YELLOW);
+                    }
+                }
+            } else {
+                $plugins[$plugin['name']] = $plugin['version'];
+                $this->writeln($output, '🦁', 'Add "' . $plugin['name'] . '" : ' . $plugin['version'], Colors::YELLOW);
+            }
+        }
+        ksort($plugins);
+        $jsonData['plugins'] = $plugins;
+        @file_put_contents($jsonFile, @json_encode($jsonData, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+
+        $this->writeClose($output, '✅', 'Plugins in wordpress.json updated');
+    }
+
+    /**
      * @param InputInterface $input
      * @param OutputInterface $output
      * @param string $name
@@ -122,8 +171,30 @@ class PluginsController
      */
     public function requirePlugin(InputInterface $input, OutputInterface $output, string $name, string $appDirectory): void
     {
-        $this->getPlugin($input, $output, $name, '', $appDirectory)
-            ->addToJsonFile($output, $name, $appDirectory);
+        $cliPath = $this->getWpCliPath($appDirectory);
+        $cli = $cliPath . ' plugin search ' . $name . ' --path=' . $this->getWordpressDirectory($appDirectory);
+        $commands = [
+            $cli . ' --per-page=9 --page=1 --format=json --fields=name,version,slug'
+        ];
+        $resultsJson = $this->runCommands($output, $appDirectory, $commands, false, true);
+
+        $data = @json_decode($resultsJson, true, 512, JSON_THROW_ON_ERROR);
+        $max = count($data);
+
+        if ($max >= 1) {
+            $first = $data[0];
+            if ($first['slug'] === $name) {
+                $this->getPlugin($input, $output, $first['slug'], $first['version'], $appDirectory)
+                    ->addToJsonFile($output, $name, $appDirectory);
+                $this->writeln($output, '✅️', $first['name'] . ' installed');
+            } else {
+                $this->writeln($output, '🤷‍️', 'No plugin found with slug ' . $name, Colors::RED);
+                for ($index = 1; $index < $max; $index++) {
+                    $this->writeln($output, '💡', 'Maybe you mean: ' . $data[$index]['name'], Colors::RED, '');
+                    $this->writeln($output, '👉️', 'php ypa-wp require ' . $data[$index]['slug'], Colors::MAGENTA);
+                }
+            }
+        }
     }
 
     /**
@@ -228,7 +299,7 @@ class PluginsController
      */
     private function downloadPlugin(string $zipFile, string $downloadUrl): self
     {
-        file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrl));
+        @file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrl));
         return $this;
     }
 
@@ -265,7 +336,7 @@ class PluginsController
         $plugins[$name] = $this->getPluginVersion($output, $appDirectory, $name);
         ksort($plugins);
         $jsonData['plugins'] = $plugins;
-        file_put_contents($jsonFile, json_encode($jsonData, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        @file_put_contents($jsonFile, @json_encode($jsonData, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 
     /**
@@ -294,5 +365,19 @@ class PluginsController
     private function getCustomPluginsDirectory(string $appDirectory): string
     {
         return $this->getResourcesDirectory($appDirectory) . DIRECTORY_SEPARATOR . 'plugins';
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    private function getInstalledPlugins(OutputInterface $output, string $appDirectory): array
+    {
+        $cliPath = $this->getWpCliPath($appDirectory);
+        $commands = [
+            $cliPath . ' plugin list --path=' . $this->getWordpressDirectory($appDirectory) . ' --format=json',
+        ];
+        $installed = $this->runCommands($output, $appDirectory, $commands, false, true);
+        $installedPlugins = @json_decode($installed, true, 512, JSON_THROW_ON_ERROR);
+        return $installedPlugins ?? [];
     }
 }
