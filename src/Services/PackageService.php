@@ -12,7 +12,7 @@ class PackageService
     public function __construct()
     {
         $this->client = new Client();
-        $this->url = 'https://packages.ypa.agency/hot-sauce';
+        $this->url = 'https://hot-sauce.joskoomen.nl/hot-sauce';
     }
 
     /**
