@@ -247,12 +247,15 @@ class PluginsController
     private function getPlugin(InputInterface $input, OutputInterface $output, string $name, string $source, string $appDirectory): self
     {
         $zipFile = $this->makeFilename('plugin-' . $name);
-        if (empty($source)) {
-            $zipSource = $this->wordpressService->getPluginZipName($name);
-        } elseif ((float)$source > 0) {
-            $zipSource = $this->wordpressService->getPluginZipName($name . '.' . $source);
+
+        $zipSources = [];
+        if (strpos($source, 'http') !== false) {
+            $zipSources[] = $source;
+        } else if(empty($source)){
+            $zipSources[] = $this->wordpressService->getPluginZipName($name);
         } else {
-            $zipSource = $source;
+            $zipSources[] = $this->wordpressService->getPluginZipName($name . '.' . $source);
+            $zipSources[] = $this->wordpressService->getPluginZipName($name);
         }
 
         if ($this->hasOption($input, OptionNames::PRODUCTION)) {
@@ -261,7 +264,7 @@ class PluginsController
             $extractDir = $this->getPluginsDirectory($appDirectory);
         }
 
-        $this->downloadPlugin($zipFile, $zipSource)
+        $this->downloadPlugin($zipFile, $zipSources)
             ->extract($zipFile, $extractDir)
             ->cleanUp($zipFile);
 
@@ -293,13 +296,17 @@ class PluginsController
      * Download the temporary Zip to the given plugin.
      *
      * @param string $zipFile
-     * @param string $downloadUrl
+     * @param array $downloadUrls
      *
      * @return $this
      */
-    private function downloadPlugin(string $zipFile, string $downloadUrl): self
+    private function downloadPlugin(string $zipFile, array $downloadUrls): self
     {
-        @file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrl));
+        try {
+            @file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrls[0]));
+        } catch (\Exception $e) {
+            @file_put_contents($zipFile, $this->wordpressService->downloadPlugin($downloadUrls[1]));
+        }
         return $this;
     }
 

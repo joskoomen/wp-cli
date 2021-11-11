@@ -24,7 +24,7 @@ class WordpressService
     /**
      * @return string
      */
-    public function downloadPlugin($url): string
+    public function downloadPlugin(string $url): string
     {
         $response = $this->client->get($url);
         return $response->getBody();
