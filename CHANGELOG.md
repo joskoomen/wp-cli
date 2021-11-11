@@ -4,3 +4,9 @@
 
 ### Added
 - First version as external package
+
+## [1.4.2 (2021-11-11)](<https://github.com/ypa-packages/ypa-wp-cli/releases/tag/1.4.2>)
+
+### Added
+- Improved structure for wordpress.json
+- Fallback zip for downloading plugins without version so we can always use the latest version available
