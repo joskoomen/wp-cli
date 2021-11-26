@@ -1,10 +1,10 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Commands;
+namespace JosKoomen\Wordpress\Cli\Commands;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Ypa\Wordpress\Cli\Controllers\PluginsController;
+use JosKoomen\Wordpress\Cli\Controllers\PluginsController;
 
 class PluginUpdateCommand extends AbstractCommand
 {

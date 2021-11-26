@@ -1,8 +1,8 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Traits;
+namespace JosKoomen\Wordpress\Cli\Traits;
 
-use Ypa\Wordpress\Cli\Constants\Colors;
+use JosKoomen\Wordpress\Cli\Constants\Colors;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
