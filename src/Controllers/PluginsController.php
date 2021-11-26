@@ -1,17 +1,17 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Controllers;
+namespace JosKoomen\Wordpress\Cli\Controllers;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Ypa\Wordpress\Cli\Constants\Colors;
-use Ypa\Wordpress\Cli\Constants\OptionNames;
-use Ypa\Wordpress\Cli\Resources\PluginsResource;
-use Ypa\Wordpress\Cli\Services\WordpressService;
-use Ypa\Wordpress\Cli\Traits\CmdTrait;
-use Ypa\Wordpress\Cli\Traits\CreatorTrait;
-use Ypa\Wordpress\Cli\Traits\DirectoryTrait;
+use JosKoomen\Wordpress\Cli\Constants\Colors;
+use JosKoomen\Wordpress\Cli\Constants\OptionNames;
+use JosKoomen\Wordpress\Cli\Resources\PluginsResource;
+use JosKoomen\Wordpress\Cli\Services\WordpressService;
+use JosKoomen\Wordpress\Cli\Traits\CmdTrait;
+use JosKoomen\Wordpress\Cli\Traits\CreatorTrait;
+use JosKoomen\Wordpress\Cli\Traits\DirectoryTrait;
 
 class PluginsController
 {
@@ -191,7 +191,7 @@ class PluginsController
                 $this->writeln($output, '🤷‍️', 'No plugin found with slug ' . $name, Colors::RED);
                 for ($index = 1; $index < $max; $index++) {
                     $this->writeln($output, '💡', 'Maybe you mean: ' . $data[$index]['name'], Colors::RED, '');
-                    $this->writeln($output, '👉️', 'php ypa-wp require ' . $data[$index]['slug'], Colors::MAGENTA);
+                    $this->writeln($output, '👉️', 'php jkwp require ' . $data[$index]['slug'], Colors::MAGENTA);
                 }
             }
         }

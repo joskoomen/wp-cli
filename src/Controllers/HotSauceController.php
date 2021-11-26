@@ -1,12 +1,12 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Controllers;
+namespace JosKoomen\Wordpress\Cli\Controllers;
 
-use Ypa\Wordpress\Cli\Constants\Colors;
-use Ypa\Wordpress\Cli\Services\PackageService;
-use Ypa\Wordpress\Cli\Traits\CmdTrait;
-use Ypa\Wordpress\Cli\Traits\CreatorTrait;
-use Ypa\Wordpress\Cli\Traits\DirectoryTrait;
+use JosKoomen\Wordpress\Cli\Constants\Colors;
+use JosKoomen\Wordpress\Cli\Services\PackageService;
+use JosKoomen\Wordpress\Cli\Traits\CmdTrait;
+use JosKoomen\Wordpress\Cli\Traits\CreatorTrait;
+use JosKoomen\Wordpress\Cli\Traits\DirectoryTrait;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class HotSauceController

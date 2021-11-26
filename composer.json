@@ -1,22 +1,26 @@
 {
-  "name" : "ypa/wp-cli",
+  "name" : "joskoomen/wp-cli",
   "description" : "Wordpress CLI package.",
-  "version" : "1.5.0",
+  "version" : "2.0.0",
   "type" : "package",
   "license" : "MIT",
   "keywords" : [
     "wordpress",
-    "ypa"
+    "joskoomen",
+    "php"
   ],
+  "extra" : {
+    "hot-sauce-zip" : "https://hot-sauce.joskoomen.nl/hot-sauce-wp.zip"
+  },
   "authors" : [
     {
       "name" : "Jos Koomen",
-      "email" : "jos@yourpersonalagency.nl"
+      "email" : "ik@joskoomen.nl"
     }
   ],
   "autoload" : {
     "psr-4" : {
-      "Ypa\\Wordpress\\Cli\\" : "src/"
+      "JosKoomen\\Wordpress\\Cli\\" : "src/"
     }
   },
   "require" : {

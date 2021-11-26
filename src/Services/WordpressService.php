@@ -1,6 +1,6 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Services;
+namespace JosKoomen\Wordpress\Cli\Services;
 
 use GuzzleHttp\Client;
 

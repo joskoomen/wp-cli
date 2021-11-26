@@ -1,8 +1,8 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Commands;
+namespace JosKoomen\Wordpress\Cli\Commands;
 
-use Ypa\Wordpress\Cli\Controllers\PluginsController;
+use JosKoomen\Wordpress\Cli\Controllers\PluginsController;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Traits;
+namespace JosKoomen\Wordpress\Cli\Traits;
 
 
 trait DirectoryTrait

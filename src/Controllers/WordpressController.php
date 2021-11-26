@@ -1,12 +1,12 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Controllers;
+namespace JosKoomen\Wordpress\Cli\Controllers;
 
 use Exception;
 use JsonException;
 use RuntimeException;
-use Ypa\Wordpress\Cli\Constants\OptionNames;
-use Ypa\Wordpress\Cli\Services\WordpressService;
+use JosKoomen\Wordpress\Cli\Constants\OptionNames;
+use JosKoomen\Wordpress\Cli\Services\WordpressService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -24,7 +24,7 @@ class WordpressController extends HotSauceController
     private string $dbPrefix;
     private WordpressService $wordpressService;
 
-    public function __construct($projectName = 'YPA', $adminEmail = '', $dbHost = 'localhost', $dbName = '', $dbUser = '', $dbPass = '', $dbPrefix = 'wp_')
+    public function __construct($projectName = 'Your Wordpress Project', $adminEmail = '', $dbHost = '127.0.0.1', $dbName = '', $dbUser = '', $dbPass = '', $dbPrefix = 'wp_')
     {
         parent::__construct();
 
@@ -315,7 +315,7 @@ class WordpressController extends HotSauceController
         $wpPath = $this->getWordpressDirectory($appDirectory);
         $commands = [
             $cliPath . ' core install --path=' . $wpPath . ' --url=http://localhost:11001 --title="' . $this->projectName .
-            '" --admin_name=admin --admin_password=Yarno123! --admin_email=' . $this->adminEmail . ' --quiet',
+            '" --admin_name=admin --admin_password=Jos123! --admin_email=' . $this->adminEmail . ' --quiet',
             $cliPath . ' theme activate ' . $themeFolderName . ' --path=' . $wpPath . '  --quiet',
             $cliPath . ' option set blog_public 0 --path=' . $wpPath . '  --quiet'
         ];
@@ -334,12 +334,12 @@ class WordpressController extends HotSauceController
         $output->writeln('<comment>🤠 Your wp-admin password 👉 </comment> Yarno123!');
         $output->writeln('<fg=cyan;options=bold>🚀 To start try to run one of the following commands:</>');
         if (!$this->hasOption($input, OptionNames::INSTALL)) {
-            $output->writeln('<comment>👉 php ypa-wp install</comment> to install your plugins');
+            $output->writeln('<comment>👉 php jkwp install</comment> to install your plugins');
         }
-        $output->writeln('<comment>👉 php ypa-wp serve</comment> to run your localhost');
-        $output->writeln('<comment>👉 php ypa-wp db:init</comment> to start with migrations');
-        $output->writeln('<comment>👉 php ypa-wp require your-pluginname</comment> to add a new plugin');
-        $output->writeln('<comment>👉 php ypa-wp require your-pluginname another-plugin-name</comment> to add multiple plugins');
+        $output->writeln('<comment>👉 php jkwp serve</comment> to run your localhost');
+        $output->writeln('<comment>👉 php jkwp db:init</comment> to start with migrations');
+        $output->writeln('<comment>👉 php jkwp require your-pluginname</comment> to add a new plugin');
+        $output->writeln('<comment>👉 php jkwp require your-pluginname another-plugin-name</comment> to add multiple plugins');
     }
 
     /**

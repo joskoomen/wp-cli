@@ -1,3 +1,3 @@
-#YPA WP-CLI
+#Jos Koomen WP-CLI
 
-Package to use with YPA wp-kickstarter
+CLI Tool to use with the [WP-Kickstarter template](https://github.com/joskoomen/wp-kickstarter).

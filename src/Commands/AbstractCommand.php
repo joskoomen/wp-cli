@@ -1,10 +1,10 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Commands;
+namespace JosKoomen\Wordpress\Cli\Commands;
 
-use Ypa\Wordpress\Cli\Traits\CmdTrait;
-use Ypa\Wordpress\Cli\Traits\CreatorTrait;
-use Ypa\Wordpress\Cli\Traits\DirectoryTrait;
+use JosKoomen\Wordpress\Cli\Traits\CmdTrait;
+use JosKoomen\Wordpress\Cli\Traits\CreatorTrait;
+use JosKoomen\Wordpress\Cli\Traits\DirectoryTrait;
 use Symfony\Component\Console\Command\Command;
 
 class AbstractCommand extends Command
