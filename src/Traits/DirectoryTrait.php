@@ -85,14 +85,4 @@ trait DirectoryTrait
     {
         return $appDirectory . DIRECTORY_SEPARATOR . 'wordpress.json';
     }
-
-    protected function getMigrationsDirectory($directory): string
-    {
-        return $directory . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Migrations';
-    }
-
-    protected function getDbBackupsDirectory($directory): string
-    {
-        return $directory . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'backups';
-    }
 }
