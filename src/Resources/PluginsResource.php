@@ -1,13 +1,13 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Resources;
+namespace JosKoomen\Wordpress\Cli\Resources;
 
 
 use Symfony\Component\DomCrawler\Crawler;
-use Ypa\Wordpress\Cli\Controllers\PluginsController;
-use Ypa\Wordpress\Cli\Services\WordpressService;
-use Ypa\Wordpress\Cli\Traits\CmdTrait;
-use Ypa\Wordpress\Cli\Traits\DirectoryTrait;
+use JosKoomen\Wordpress\Cli\Controllers\PluginsController;
+use JosKoomen\Wordpress\Cli\Services\WordpressService;
+use JosKoomen\Wordpress\Cli\Traits\CmdTrait;
+use JosKoomen\Wordpress\Cli\Traits\DirectoryTrait;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginsResource

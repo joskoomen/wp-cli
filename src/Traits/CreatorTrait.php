@@ -1,6 +1,6 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Traits;
+namespace JosKoomen\Wordpress\Cli\Traits;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +27,7 @@ trait CreatorTrait
      *
      * @return string
      */
-    protected function makeFilename(string $prefix = 'ypa'): string
+    protected function makeFilename(string $prefix = 'joskoomen'): string
     {
         return getcwd() . '/' . $prefix . '_' . md5(time() . uniqid('', false)) . '.zip';
     }

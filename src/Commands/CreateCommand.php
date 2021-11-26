@@ -1,8 +1,8 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Commands;
+namespace JosKoomen\Wordpress\Cli\Commands;
 
-use Ypa\Wordpress\Cli\Controllers\WordpressController;
+use JosKoomen\Wordpress\Cli\Controllers\WordpressController;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -67,12 +67,12 @@ class CreateCommand extends AbstractCommand
             $projectName = $helper->ask($input, $output, $nameQuestion);
         }
 
-        $dbHostQuestion = new Question('<comment>Enter the DB_HOST of your project </comment> (default = localhost) 👉 ', 'localhost');
+        $dbHostQuestion = new Question('<comment>Enter the DB_HOST of your project </comment> (default = localhost) 👉 ', '127.0.0.1');
         $dbNameQuestion = new Question('<comment>Enter the DB_DATABASE of your project 👉 </comment> ');
         $dbUserQuestion = new Question('<comment>Enter the DB_USERNAME of your project </comment> (default = root) 👉 ', 'root');
         $dbPassQuestion = new Question('<comment>Enter the DB_PASSWORD of your project </comment> (default = root) 👉 ', 'root');
         $dbTablePrefixQuestion = new Question('<comment>Enter the DB_TABLE_PREFIX of your project </comment> (default = wp_) 👉 ', 'wp_');
-        $adminEmailQuestion = new Question('<comment>Enter your e-mail address (for wp-admin) </comment> (default = dev@yourpersonalagency.nl) 👉 ', 'dev@yourpersonalagency.nl');
+        $adminEmailQuestion = new Question('<comment>Enter your e-mail address (for wp-admin) </comment> (default = noreply@joskoomen.nl) 👉 ', 'noreply@joskoomen.nl');
         $dbHost = $helper->ask($input, $output, $dbHostQuestion);
         $dbName = $helper->ask($input, $output, $dbNameQuestion);
         $dbUser = $helper->ask($input, $output, $dbUserQuestion);

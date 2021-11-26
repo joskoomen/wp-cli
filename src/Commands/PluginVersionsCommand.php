@@ -1,14 +1,14 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Commands;
+namespace JosKoomen\Wordpress\Cli\Commands;
 
 use GuzzleHttp\Client;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
-use Ypa\Wordpress\Cli\Controllers\PluginsController;
-use Ypa\Wordpress\Cli\Resources\PluginsResource;
+use JosKoomen\Wordpress\Cli\Controllers\PluginsController;
+use JosKoomen\Wordpress\Cli\Resources\PluginsResource;
 
 class PluginVersionsCommand extends AbstractCommand
 {

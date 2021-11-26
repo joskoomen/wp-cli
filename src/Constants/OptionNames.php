@@ -1,6 +1,6 @@
 <?php
 
-namespace Ypa\Wordpress\Cli\Constants;
+namespace JosKoomen\Wordpress\Cli\Constants;
 
 class OptionNames
 {
