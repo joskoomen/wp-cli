@@ -42,10 +42,11 @@ class WordpressController extends HotSauceController
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
+     * @param string $wpUrl
      *
      * @throws JsonException
      */
-    public function start(InputInterface $input, OutputInterface $output): void
+    public function start(InputInterface $input, OutputInterface $output, string $wpUrl = 'http://localhost:11001'): void
     {
         $appDirectory = $this->getDirectory($input);
         $version = $this->getVersion($input);
@@ -62,7 +63,7 @@ class WordpressController extends HotSauceController
             ->updateSaltKeys($wpDirectory . 'wp-config.php');
         $this->setThemeName($appDirectory)
             ->updateWordpressVersion($appDirectory);
-        $this->finishingUp($input, $output, $appDirectory);
+        $this->finishingUp($input, $output, $appDirectory, $wpUrl);
     }
 
     public function symlink(string $sourceDir, string $distDir): void
@@ -300,7 +301,7 @@ class WordpressController extends HotSauceController
      * @return void
      * @throws JsonException
      */
-    private function installAndActivate(InputInterface $input, OutputInterface $output, string $appDirectory): void
+    private function installAndActivate(InputInterface $input, OutputInterface $output, string $appDirectory, string $wpUrl): void
     {
         $themeFolderName = strtolower(str_replace(' ', '-', $this->projectName));
 
@@ -314,7 +315,7 @@ class WordpressController extends HotSauceController
         $cliPath = $this->getWpCliPath($appDirectory);
         $wpPath = $this->getWordpressDirectory($appDirectory);
         $commands = [
-            $cliPath . ' core install --path=' . $wpPath . ' --url=http://localhost:11001 --title="' . $this->projectName .
+            $cliPath . ' core install --path=' . $wpPath . ' --url=' . $wpUrl . ' --title="' . $this->projectName .
             '" --admin_name=admin --admin_password=Jos123! --admin_email=' . $this->adminEmail . ' --quiet',
             $cliPath . ' theme activate ' . $themeFolderName . ' --path=' . $wpPath . '  --quiet',
             $cliPath . ' option set blog_public 0 --path=' . $wpPath . '  --quiet'
@@ -350,11 +351,11 @@ class WordpressController extends HotSauceController
      * @return void
      * @throws JsonException
      */
-    private function finishingUp(InputInterface $input, OutputInterface $output, string $appDirectory): void
+    private function finishingUp(InputInterface $input, OutputInterface $output, string $appDirectory, string $wpUrl): void
     {
         $this->rcopy($this->getTempWpDirectory($appDirectory), $this->getWordpressDirectory($appDirectory));
         $this->rrmdir($this->getTempWpDirectory($appDirectory));
 
-        $this->installAndActivate($input, $output, $appDirectory);
+        $this->installAndActivate($input, $output, $appDirectory, $wpUrl);
     }
 }

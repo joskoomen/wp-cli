@@ -2,6 +2,7 @@
 
 namespace JosKoomen\Wordpress\Cli\Commands;
 
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use JosKoomen\Wordpress\Cli\Constants\OptionNames;
 use JosKoomen\Wordpress\Cli\Controllers\PluginsController;
@@ -20,7 +21,11 @@ class PluginInstallCommand extends AbstractCommand
         $this
             ->setName('install')
             ->setDescription('Install the Wordpress plugins')
-            ->addOption(OptionNames::PRODUCTION, 'p', InputOption::VALUE_NONE, 'Optionally production mode');
+            ->setDefinition(
+                new InputDefinition([
+                    new InputOption(OptionNames::PRODUCTION, 'p', InputOption::VALUE_NONE, 'Optionally production mode'),
+                ])
+            );
         parent::configure();
     }
 

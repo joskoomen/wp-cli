@@ -2,9 +2,12 @@
 
 namespace JosKoomen\Wordpress\Cli\Commands;
 
+use JosKoomen\Wordpress\Cli\Constants\OptionNames;
 use JosKoomen\Wordpress\Cli\Controllers\PluginsController;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginRemoveCommand extends AbstractCommand
@@ -19,7 +22,11 @@ class PluginRemoveCommand extends AbstractCommand
         $this
             ->setName('remove')
             ->setDescription('Remove a Wordpress plugin')
-            ->addArgument('plugins', InputArgument::IS_ARRAY);
+            ->setDefinition(
+                new InputDefinition([
+                    new InputArgument('plugins', InputArgument::IS_ARRAY),
+                ])
+            );
         parent::configure();
     }
 

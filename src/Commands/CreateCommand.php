@@ -3,6 +3,7 @@
 namespace JosKoomen\Wordpress\Cli\Commands;
 
 use JosKoomen\Wordpress\Cli\Controllers\WordpressController;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,9 +19,18 @@ class CreateCommand extends AbstractCommand
         $this
             ->setName('create')
             ->setDescription('Create a new Wordpress')
-            ->addOption('dev', null, InputOption::VALUE_NONE, 'Installs the latest "development" release')
-            ->addOption('wpv', 'w', InputOption::VALUE_REQUIRED, 'An optional version for your wordpress installation')
-            ->addOption('install', 'i', InputOption::VALUE_NONE, 'Optionally install plugins too');
+            ->setDefinition(
+                new InputDefinition([
+                    new InputOption('name', 'n', InputOption::VALUE_REQUIRED, 'An optional name of the project'),
+                    new InputOption('dbname', 'db', InputOption::VALUE_REQUIRED, 'An optional database name'),
+                    new InputOption('dbuser', 'u', InputOption::VALUE_REQUIRED, 'An optional database username'),
+                    new InputOption('dbpass', 'p', InputOption::VALUE_REQUIRED, 'An optional database password'),
+                    new InputOption('dev', null, InputOption::VALUE_NONE, 'Installs the latest "development" release'),
+                    new InputOption('wpv', 'w', InputOption::VALUE_REQUIRED, 'An optional version for your wordpress installation'),
+                    new InputOption('email', null, InputOption::VALUE_REQUIRED, 'Optional admin emailaddress'),
+                    new InputOption('install', 'i', InputOption::VALUE_NONE,  'Optionally install plugins too')
+                ])
+            );
 
         parent::configure();
     }
@@ -54,8 +64,8 @@ class CreateCommand extends AbstractCommand
         $wpJsonFile = $this->getWpJsonPath($appDirectory);
 
         $file = @file_get_contents($wpJsonFile) ?? '';
-        $projectName = '';
-        if (!empty($file)) {
+        $projectName = $this->get;
+        if (empty($projectName) && !empty($file)) {
             $json = @json_decode($file, true, 512, JSON_THROW_ON_ERROR);
             $projectName = $json['name'] ?? '';
         }
@@ -93,8 +103,7 @@ class CreateCommand extends AbstractCommand
     /**
      * Verify that the application does not already exist.
      *
-     * @param string $directory
-     *
+     * @param string $appDirectory
      * @return void
      */
     private function verifyApplicationDoesntExist(string $appDirectory): void

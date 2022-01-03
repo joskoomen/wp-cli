@@ -3,6 +3,8 @@
 namespace JosKoomen\Wordpress\Cli\Commands;
 
 use GuzzleHttp\Client;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,7 +19,11 @@ class PluginVersionsCommand extends AbstractCommand
         $this
             ->setName('list')
             ->setDescription('List versions of a plugin')
-            ->addArgument('plugin', InputOption::VALUE_REQUIRED, 'The plugin to list');
+            ->setDefinition(
+                new InputDefinition([
+                    new InputArgument('plugin', InputOption::VALUE_REQUIRED, 'The plugin to list'),
+                ])
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
